@@ -251,6 +251,14 @@ def menu(death_count):
             scoreRect = score.get_rect()
             scoreRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50)
             SCREEN.blit(score, scoreRect)
+
+        # 랭킹: 이번 판의 점수를 텍스트 파일에 저장
+        f = open("ranking.txt", 'w')
+        rankData = str(points) + '\n'
+        f.write(rankData)
+        f.close()
+        ###
+        
         textRect = text.get_rect()
         textRect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         SCREEN.blit(text, textRect)
@@ -258,7 +266,8 @@ def menu(death_count):
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+                exit(0)
             if event.type == pygame.KEYDOWN:
                 main()
 
