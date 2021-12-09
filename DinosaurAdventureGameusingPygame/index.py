@@ -87,17 +87,22 @@ def load_sprite_sheet(
 
     return sprites,sprite_rect
 
-def disp_gameOver_msg(retbutton_image,gameover_image):
+def disp_gameOver_msg(retbutton_image,gameover_image,rank_image):
     retbutton_rect = retbutton_image.get_rect()
     retbutton_rect.centerx = width / 2
-    retbutton_rect.top = height*0.52
+    retbutton_rect.top = height*0.81
 
     gameover_rect = gameover_image.get_rect()
     gameover_rect.centerx = width / 2
-    gameover_rect.centery = height*0.35
+    gameover_rect.centery = height*0.28
+
+    rank_rect = rank_image.get_rect()
+    rank_rect.centerx = width / 2
+    rank_rect.centery = height*0.40
 
     screen.blit(retbutton_image, retbutton_rect)
     screen.blit(gameover_image, gameover_rect)
+    screen.blit(rank_image, rank_rect)
 
 def extractDigits(number):
     if number > -1:
@@ -294,7 +299,7 @@ class Scoreboard():
             self.image.blit(self.tempimages[s],self.temprect)
             self.temprect.left += self.temprect.width
         self.temprect.left = 0
-
+        
 
 def introscreen():
     temp_dino = Dino(44,47)
@@ -348,6 +353,7 @@ def gameplay():
     scb = Scoreboard()
     highsc = Scoreboard(width*0.78)
     counter = 0
+    refresh_rank = 0
 
     cacti = pygame.sprite.Group()
     pteras = pygame.sprite.Group()
@@ -360,6 +366,7 @@ def gameplay():
 
     retbutton_image,retbutton_rect = load_image('replay_button.png',35,31,-1)
     gameover_image,gameover_rect = load_image('game_over.png',190,11,-1)
+    rank_image,rank_rect = load_image('rank.png',84,22,-1)
 
     temp_images,temp_rect = load_sprite_sheet('numbers.png',12,1,11,int(11*6/5),-1)
     HI_image = pygame.Surface((22,int(11*6/5)))
@@ -495,8 +502,56 @@ def gameplay():
                             gameOver = False
                             gameplay()
             highsc.update(high_score)
+
+            ###
+            if refresh_rank == 0:
+                    refresh_rank = 1
+                    f = open("ranksave.txt", 'a')
+                    data = str(playerDino.score)
+                    f.write(data)
+                    f.write('\n')
+                
+                    f = open("ranksave.txt","r")
+                
+                    new_lines = [0,0,0]
+                    for line in f:
+                        new_lines.append(int(line.strip('\n')))
+
+                    print(new_lines)
+                    print('\n')
+                
+                    new_lines.sort(reverse=True)
+
+                    print(new_lines)
+                    font = pygame.font.Font('PressStart2P-vaV7.ttf',12)
+                    text = font.render('1st',True,(90,137,23))
+                    screen.blit(text,(240,150))
+                    text = font.render('2nd',True,(90,137,23))
+                    screen.blit(text,(240,180))
+                    text = font.render('3rd',True,(90,137,23))
+                    screen.blit(text,(240,210))
+                    
+                    text = font.render(str(new_lines[0]),True,(0,0,0))
+                    screen.blit(text,(320,150))
+                    text = font.render(str(new_lines[1]),True,(0,0,0))
+                    screen.blit(text,(320,180))
+                    text = font.render(str(new_lines[2]),True,(0,0,0))
+                    screen.blit(text,(320,210))
+
+                    if new_lines[0] == playerDino.score:
+                        text = font.render(str(new_lines[0]),True,(255,0,0))
+                        screen.blit(text,(320,150))
+                    elif new_lines[1] == playerDino.score:
+                        text = font.render(str(new_lines[1]),True,(255,0,0))
+                        screen.blit(text,(320,180))
+                    elif new_lines[2] == playerDino.score:
+                        text = font.render(str(new_lines[2]),True,(255,0,0))
+                        screen.blit(text,(320,210))
+                    ###
+            
             if pygame.display.get_surface() != None:
-                disp_gameOver_msg(retbutton_image,gameover_image)
+                disp_gameOver_msg(retbutton_image,gameover_image,rank_image)
+                    
                 if high_score != 0:
                     highsc.draw()
                     screen.blit(HI_image,HI_rect)
@@ -505,6 +560,7 @@ def gameplay():
 
     pygame.quit()
     quit()
+        
 
 def main():
     isGameQuit = introscreen()
