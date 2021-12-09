@@ -503,7 +503,6 @@ def gameplay():
                             gameplay()
             highsc.update(high_score)
 
-            ###
             if refresh_rank == 0:
                     refresh_rank = 1
                     f = open("ranksave.txt", 'a')
@@ -547,7 +546,6 @@ def gameplay():
                     elif new_lines[2] == playerDino.score:
                         text = font.render(str(new_lines[2]),True,(255,0,0))
                         screen.blit(text,(320,210))
-                    ###
             
             if pygame.display.get_surface() != None:
                 disp_gameOver_msg(retbutton_image,gameover_image,rank_image)
