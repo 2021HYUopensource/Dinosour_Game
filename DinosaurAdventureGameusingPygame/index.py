@@ -24,6 +24,9 @@ jump_sound = pygame.mixer.Sound('sprites/jump.wav')
 die_sound = pygame.mixer.Sound('sprites/die.wav')
 checkPoint_sound = pygame.mixer.Sound('sprites/checkPoint.wav')
 
+bg_sound = pygame.mixer.Sound('sprites/music.wav')
+bg_sound.play(-1)
+
 def load_image(
     name,
     sizex=-1,
@@ -141,7 +144,10 @@ class Dino():
     def update(self):
         if self.isJumping:
             self.movement[1] = self.movement[1] + gravity
-
+        
+        if self.rect.top < 0:
+            self.rect.top = 0
+        
         if self.isJumping:
             self.index = 0
         elif self.isBlinking:
