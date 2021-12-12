@@ -14,7 +14,7 @@ gravity = 0.6
 
 black = (0,0,0)
 white = (255,255,255)
-background_col = (235,235,235)
+background_col = (122,210,247)  
 
 high_score = 0
 
@@ -269,8 +269,8 @@ class Coin(pygame.sprite.Sprite): #스프라이트를 제작하기 위해 선언
 
 class Ground():
     def __init__(self,speed=-5):
-        self.image,self.rect = load_image('ground.png',-1,-1,-1)
-        self.image1,self.rect1 = load_image('ground.png',-1,-1,-1)
+        self.image,self.rect = load_image('ground2.png',-1,-1,-1)
+        self.image1,self.rect1 = load_image('ground2.png',-1,-1,-1)
         self.rect.bottom = height
         self.rect1.bottom = height
         self.rect1.left = self.rect.right
@@ -293,8 +293,8 @@ class Ground():
 class Cloud(pygame.sprite.Sprite):
     def __init__(self,x,y):
         pygame.sprite.Sprite.__init__(self,self.containers)
-        self.image,self.rect = load_image('cloud.png',int(90*30/42),30,-1)
-        self.speed = 1
+        self.image,self.rect = load_image('clouds2.png',int(150*30/42),30,-1)
+        self.speed = 3                                                             
         self.rect.left = x
         self.rect.top = y
         self.movement = [-1*self.speed,0]
