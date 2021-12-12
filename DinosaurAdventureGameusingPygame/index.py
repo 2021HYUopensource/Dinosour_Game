@@ -150,6 +150,9 @@ class Dino():
             self.isJumping = False
 
     def update(self):
+        global a
+        global b
+
         if self.isJumping:
             self.movement[1] = self.movement[1] + gravity
         
