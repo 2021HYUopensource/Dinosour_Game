@@ -5,6 +5,8 @@ import random
 from pygame import *
 
 pygame.init()
+a = 0
+b = 0
 
 scr_size = (width,height) = (600,300)
 FPS = 60
@@ -21,6 +23,7 @@ clock = pygame.time.Clock()
 pygame.display.set_caption("Dinosuar Adventure ")
 
 jump_sound = pygame.mixer.Sound('sprites/jump.wav')
+coin_sound = pygame.mixer.Sound('sprites/coinSound.wav') ###
 die_sound = pygame.mixer.Sound('sprites/die.wav')
 checkPoint_sound = pygame.mixer.Sound('sprites/checkPoint.wav')
 
@@ -188,6 +191,14 @@ class Dino():
             if self.score % 100 == 0 and self.score != 0:
                 if pygame.mixer.get_init() != None:
                     checkPoint_sound.play()
+        if b == 1:
+            c = self.score // 100
+            self.score += 10 #코인에 닿으면 10점씩 올라감
+            d = self.score // 100
+            b = 0
+            if ( c < d):
+                if pygame.mixer.get_init() != None:
+                    checkPoint_sound.play()
 
         self.counter = (self.counter + 1)
 
@@ -233,6 +244,25 @@ class Ptera(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
+class Coin(pygame.sprite.Sprite): #스프라이트를 제작하기 위해 선언
+    def __init__(self,speed=5,sizex=-1,sizey=-1):# 스프라이트 초기화
+        pygame.sprite.Sprite.__init__(self,self.containers)
+        self.images,self.rect = load_sprite_sheet('coin.png',3,1,sizex,sizey,-1) # 이미지 정의
+        self.rect.bottom = int(0.98*height)
+        self.rect.left = width + self.rect.width
+        self.image = self.images[random.randrange(0,3)]
+        self.movement = [-1*speed,0]
+
+
+    def draw(self):
+        screen.blit(self.image,self.rect)
+
+    def update(self):
+        self.rect = self.rect.move(self.movement)
+        global a
+        if (self.rect.right < 0) or (a == 1):
+            self.kill() 
+            a = 0
 
 class Ground():
     def __init__(self,speed=-5):
@@ -356,11 +386,13 @@ def gameplay():
     refresh_rank = 0
 
     cacti = pygame.sprite.Group()
+    coins = pygame.sprite.Group()
     pteras = pygame.sprite.Group()
     clouds = pygame.sprite.Group()
     last_obstacle = pygame.sprite.Group()
 
     Cactus.containers = cacti
+    Coin.containers = coins #추가
     Ptera.containers = pteras
     Cloud.containers = clouds
 
@@ -427,6 +459,21 @@ def gameplay():
                     if pygame.mixer.get_init() != None:
                         die_sound.play()
 
+            for C in coins: # 닿았을때 어떻게 되는지
+                global a
+                global b
+                C.movement[0] = -1*gamespeed
+                if pygame.sprite.collide_mask(playerDino,C): #공룡이랑 코인이랑 덯았을때
+                    a = 1
+                    b = 1
+                    sound = 1
+                    if (pygame.mixer.get_init() != None) and (sound == 1):
+                        coin_sound.play() #닿으면 코인소리가 남
+                        sound =0
+
+                elif pygame.sprite.collide_mask(c,C): # 선인장이랑 코인이랑 닿았을떄
+                    a = 1
+
             if len(cacti) < 2:
                 if len(cacti) == 0:
                     last_obstacle.empty()
@@ -436,6 +483,15 @@ def gameplay():
                         if l.rect.right < width*0.7 and random.randrange(0,50) == 10:
                             last_obstacle.empty()
                             last_obstacle.add(Cactus(gamespeed, 40, 40))
+            if len(coins) < 2:   # 추가한부분
+                if len(coins) == 0:
+                    last_obstacle.empty()
+                    last_obstacle.add(Coin(gamespeed,40,40))
+                else:
+                    for l in last_obstacle:
+                        if l.rect.right < width*0.7 and random.randrange(0,50) == 10:
+                            last_obstacle.empty()
+                            last_obstacle.add(Coin(gamespeed, 40, 40))
 
             if len(pteras) == 0 and random.randrange(0,200) == 10 and counter > 500:
                 for l in last_obstacle:
@@ -449,6 +505,7 @@ def gameplay():
             playerDino.update()
             cacti.update()
             pteras.update()
+            coins.update() #변화된 부분 업데이트
             clouds.update()
             new_ground.update()
             scb.update(playerDino.score)
@@ -464,6 +521,7 @@ def gameplay():
                     screen.blit(HI_image,HI_rect)
                 cacti.draw(screen)
                 pteras.draw(screen)
+                coins.draw(screen)
                 playerDino.draw()
 
                 pygame.display.update()
